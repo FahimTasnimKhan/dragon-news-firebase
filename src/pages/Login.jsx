@@ -1,10 +1,12 @@
-import React, { useContext } from "react";
-import { Link } from "react-router";
+import React, { useContext, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router";
 import { AuthContext } from "../provider/AuthProvider";
 import { auth } from "../firebase/firebase.config";
 
 const Login = () => {
+  const navigate = useNavigate();
   const { signIn } = useContext(AuthContext);
+  const [error, setError] = useState("");
   const handleLogin = (event) => {
     event.preventDefault();
     const form = event.target;
@@ -15,8 +17,12 @@ const Login = () => {
       .then((response) => {
         const user = response.user;
         console.log(user);
+        navigate("/");
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+        setError(error.code);
+      });
   };
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -33,6 +39,7 @@ const Login = () => {
               type="email"
               className="input"
               placeholder="Email"
+              required
             />
 
             {/* password  */}
@@ -42,11 +49,13 @@ const Login = () => {
               type="password"
               className="input"
               placeholder="Password"
+              required
             />
             <div>
               <a className="link link-hover">Forgot password?</a>
             </div>
 
+            {error && <p className="text-red-500">{error}</p>}
             <button className="btn btn-neutral mt-4">Login</button>
             <p className="font-semibold text-center pt-5">
               Don't have an account?{" "}
